@@ -1,3 +1,6 @@
+### This is a cloned repo to try to support the TensorFlow 2.x version. All the credits go to the original author! 
+Due to this modified version isn't submitted to the PyPI, please try to install it using setup.py. Sorry for the inconvenience.  
+
 ### **tf-matplotlib** - seamless integration of matplotlib figures into TensorFlow summaries
 
 **tf-matplotlib** renders your everyday matplotlib figures tinside TensorFlow's Tensorboard visualization interface. The library
