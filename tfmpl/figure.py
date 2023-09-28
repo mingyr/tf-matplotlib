@@ -60,7 +60,7 @@ def figure_tensor(func, **tf_pyfunc_kwargs):
                 print('-'*20)
                 raise
 
-        return tf.py_func(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
+        return tf.py_function(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
     return wrapper
 
 @vararg_decorator
