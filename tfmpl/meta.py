@@ -5,8 +5,7 @@
 
 from functools import wraps
 import tensorflow as tf
-from tensorflow.contrib.framework import is_tensor
-from collections import Sequence
+from collections.abc import Sequence
 
 def vararg_decorator(f):
     '''Decorator to handle variable argument decorators.'''
@@ -25,7 +24,7 @@ class PositionalTensorArgs:
 
     def __init__(self, args):
         self.args = args
-        self.tf_args = [(i,a) for i,a in enumerate(args) if is_tensor(a)]
+        self.tf_args = [(i,a) for i,a in enumerate(args) if tf.is_tensor(a)]
 
     @property
     def tensor_args(self):
