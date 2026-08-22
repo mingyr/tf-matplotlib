@@ -1,5 +1,5 @@
 # Copyright 2018 Christoph Heindl.
-# 
+# Copyright 2026 Yurui Ming.
 # Licensed under MIT License
 # ============================================================
 

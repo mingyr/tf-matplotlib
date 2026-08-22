@@ -36,42 +36,38 @@ Requirements
 Below are the relevant snippets to render a simple scatter plot. See [scatter.py](tfmpl/samples/scatter.py) for the complete self-contained example.
 
 ```python
+from datetime import datetime
 import tensorflow as tf
 import numpy as np
+import os
 
-import tfmpl
+import tf_matplotlib as tfmpl
 
-@tfmpl.figure_tensor
-def draw_scatter(scaled, colors): 
-    '''Draw scatter plots. One for each color.'''  
-    figs = tfmpl.create_figures(len(colors), figsize=(4,4))
-    for idx, f in enumerate(figs):
-        ax = f.add_subplot(111)
-        ax.axis('off')
-        ax.scatter(scaled[:, 0], scaled[:, 1], c=colors[idx])
-        f.tight_layout()
+if __name__ == '__main__':
+    @tfmpl.figure_tensor
+    def draw_scatter(scaled, colors): 
+        '''Draw scatter plots. One for each color.'''  
+        figs = tfmpl.create_figures(len(colors), figsize=(4,4))
+        for idx, f in enumerate(figs):
+            ax = f.add_subplot(111)
+            ax.axis('off')
+            ax.scatter(scaled[:, 0], scaled[:, 1], c=colors[idx])
+            f.tight_layout()
 
-    return figs
+        return figs  
 
-with tf.Session(graph=tf.Graph()) as sess:
-
-    # A point cloud that can be scaled by the user
-    points = tf.constant(
-        np.random.normal(loc=0.0, scale=1.0, size=(100, 2)).astype(np.float32)
-    )
-    scale = tf.placeholder(tf.float32)        
+    points = tf.random.normal((100, 2), dtype=tf.float32)
+    scale = tf.constant(2., dtype=tf.float32)        
     scaled = points*scale
-
-    # Note, `scaled` above is a tensor. Its being passed `draw_scatter` below. 
-    # However, when `draw_scatter` is invoked, the tensor will be evaluated and a
-    # numpy array representing its content is provided.   
-    image_tensor = draw_scatter(scaled, ['r', 'g'])
-    image_summary = tf.summary.image('scatter', image_tensor)      
-    all_summaries = tf.summary.merge_all() 
-    
-    writer = tf.summary.FileWriter('log', sess.graph)
-    summary = sess.run(all_summaries, feed_dict={scale: 2.})
-    writer.add_summary(summary, global_step=0)
+   
+    os.makedirs('log', exist_ok=True)
+    now = datetime.now()
+    logdir = "log/" + now.strftime("%Y%m%d-%H%M%S") + "/"
+    writer = tf.summary.create_file_writer(logdir)
+    with writer.as_default():
+        image_tensor = draw_scatter(scaled, ['r', 'g'])
+        image_summary = tf.summary.image('scatter', image_tensor, step=0)
+        writer.flush()
 ```
 
 ![](etc/scatter.png)
