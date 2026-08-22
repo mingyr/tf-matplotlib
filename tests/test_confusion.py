@@ -1,4 +1,4 @@
-import tfmpl
+import tf_matplotlib as tfmpl
 import numpy as np
 
 def test_confusion_matrix():

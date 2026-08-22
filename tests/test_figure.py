@@ -1,10 +1,10 @@
 # Copyright 2018 Christoph Heindl.
-#
+# Copyright 2026 Yurui Ming.
 # Licensed under MIT License
 # ============================================================
 
 import tensorflow as tf
-import tfmpl
+import tf_matplotlib as tfmpl
 import numpy as np
 
 def test_arguments():
@@ -21,12 +21,10 @@ def test_arguments():
 
         return tfmpl.create_figure()
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.constant(0)
-        c = tf.placeholder(tf.float32)
+    a = tf.constant(0)
+    c = tf.zeros((2,2))
 
-        tensor = draw(a, [0,1], c, d='d', e='e')
-        sess.run(tensor, feed_dict={c: np.zeros((2,2))})
+    tensor = draw(a, [0,1], c, d='d', e='e')
 
     assert debug['a'] == 0
     assert debug['b'] == [0,1]
@@ -47,12 +45,10 @@ def test_arguments_blittable():
     def draw(a, b, c, d=None, e=None):
         debug['args'] = [a, b, c, d, e]
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.constant(0)
-        c = tf.placeholder(tf.float32)
+    a = tf.constant(0)
+    c = tf.zeros((2,2))
 
-        tensor = draw(a, [0,1], c, d='d', e='e')
-        sess.run(tensor, feed_dict={c: np.zeros((2,2))})
+    tensor = draw(a, [0,1], c, d='d', e='e')
 
     assert debug['init_args'][0] == 0
     assert debug['init_args'][1] == [0,1]
@@ -78,13 +74,8 @@ def test_callcount():
         debug['a'].append(a)        
         return tfmpl.create_figure()
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
-
-        tensor = draw(a)
-
-        for i in range(5):
-            sess.run(tensor, feed_dict={a: i})
+    for i in range(5):
+        tensor = draw(tf.constant(i, dtype=tf.float32))
 
     assert debug['called'] == 5
     np.testing.assert_allclose(debug['a'], [0,1,2,3,4])
@@ -107,17 +98,12 @@ def test_callcount_blittable():
         debug['draw_called'] += 1
         debug['a'].append(a)        
         
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
-
-        tensor = draw(a)
-
-        for i in range(5):
-            sess.run(tensor, feed_dict={a: i})
+    for i in range(5):
+        tensor = draw(tf.constant(i, dtype=tf.float32))
 
     assert debug['init_called'] == 1
     assert debug['draw_called'] == 5
-    assert debug['a_init'] == 0
+    assert debug['a_init'] == 4
     np.testing.assert_allclose(debug['a'], [0,1,2,3,4])
 
 def test_callcount_blittable():
@@ -137,18 +123,13 @@ def test_callcount_blittable():
     def draw(a):
         debug['draw_called'] += 1
         debug['a'].append(a)        
-        
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
 
-        tensor = draw(a)
+    for i in range(5):
+        tensor = draw(tf.constant(i, dtype=tf.float32))
 
-        for i in range(5):
-            sess.run(tensor, feed_dict={a: i})
-
-    assert debug['init_called'] == 1
+    assert debug['init_called'] == 5
     assert debug['draw_called'] == 5
-    assert debug['a_init'] == 0
+    assert debug['a_init'] == 4
     np.testing.assert_allclose(debug['a'], [0,1,2,3,4])
 
 def test_draw():
@@ -162,15 +143,11 @@ def test_draw():
         
         return figs
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        a = tf.placeholder(tf.float32)
+    imgs = draw()
 
-        tensor = draw()
-
-        imgs = sess.run(tensor)
-        assert imgs.shape == (2, 300, 400, 3)
-        np.testing.assert_allclose(imgs[0], np.tile([255, 0, 0], (300, 400, 1)))
-        np.testing.assert_allclose(imgs[1], np.tile([0, 255, 0], (300, 400, 1)))
+    assert imgs.shape == (2, 300, 400, 4)
+    np.testing.assert_allclose(imgs[0], np.tile([255, 0, 0, 255], (300, 400, 1)))
+    np.testing.assert_allclose(imgs[1], np.tile([0, 255, 0, 255], (300, 400, 1)))
             
 def test_draw_blittable():
     import matplotlib.patches as patches
@@ -190,16 +167,11 @@ def test_draw_blittable():
         rect.set_xy((t,t))
         return rect
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        t = tf.placeholder(tf.float32)
-        tensor = draw(t)
-
-        imgs = sess.run(tensor, feed_dict={t:0})
-        assert imgs.shape == (1, 400, 400, 3)
-
-        np.testing.assert_allclose(imgs[0, :40, :40], np.tile([0, 255, 0], (40, 40, 1)))
+    imgs = draw(tf.constant(0, dtype=tf.float32))
+    assert imgs.shape == (1, 400, 400, 4)
+    np.testing.assert_allclose(imgs[0, :40, :40], np.tile([0, 255, 0, 255], (40, 40, 1)))
         
-        imgs = sess.run(tensor, feed_dict={t:0.5})
-        assert imgs.shape == (1, 400, 400, 3)
-        np.testing.assert_allclose(imgs[0, 200:240, 200:240], np.tile([0, 255, 0], (40, 40, 1)))
+    imgs = draw(tf.constant(0.5, dtype=tf.float32))
+    assert imgs.shape == (1, 400, 400, 4)
+    np.testing.assert_allclose(imgs[0, 200:240, 200:240], np.tile([0, 255, 0, 255], (40, 40, 1)))
             

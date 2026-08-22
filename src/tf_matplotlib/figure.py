@@ -1,5 +1,5 @@
 # Copyright 2018 Christoph Heindl.
-#
+# Copyright 2026 Yurui Ming.
 # Licensed under MIT License
 # ============================================================
 
@@ -8,8 +8,8 @@ import traceback
 import numpy as np
 from functools import wraps
 
-from tfmpl.meta import vararg_decorator, as_list
-from tfmpl.meta import PositionalTensorArgs
+from .meta import vararg_decorator, as_list
+from .meta import PositionalTensorArgs
 
 def figure_buffer(figs):
     '''Extract raw image buffer from matplotlib figure shaped as 1xHxWx3.'''
@@ -19,7 +19,7 @@ def figure_buffer(figs):
     for f in figs:
         wf, hf = f.canvas.get_width_height()
         assert wf == w and hf == h, 'All canvas objects need to have same size'
-        buffers.append(np.fromstring(f.canvas.tostring_rgb(), dtype=np.uint8).reshape(h, w, 3))
+        buffers.append(np.frombuffer(f.canvas.buffer_rgba(), dtype=np.uint8).reshape(h, w, 4))
 
     return np.stack(buffers) # NxHxWx3
 
@@ -60,7 +60,7 @@ def figure_tensor(func, **tf_pyfunc_kwargs):
                 print('-'*20)
                 raise
 
-        return tf.py_function(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
+        return tf.numpy_function(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
     return wrapper
 
 @vararg_decorator
@@ -135,5 +135,5 @@ def blittable_figure_tensor(func, init_func, **tf_pyfunc_kwargs):
                 print('-'*20)
                 raise
 
-        return tf.py_func(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
+        return tf.numpy_function(pyfnc_callee, tf_args.tensor_args, tf.uint8, name=name, **tf_pyfunc_kwargs)
     return wrapper
