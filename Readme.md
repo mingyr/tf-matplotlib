@@ -1,5 +1,5 @@
-### This is a cloned repo to try to support the TensorFlow 2.x version. All the credits go to the original author! 
-### Due to the retracing mechanism introduced in TensorFlow 2.x, the execution behaviour of functions makes some of the assertions in previous test scripts no more valid. Temporarily workaround is adopted, need a clean fixing.
+### This is a cloned repo trying to support TensorFlow 2.x versions. All credits go to the original author! 
+### Due to the retracing mechanism introduced in TensorFlow 2.x, the execution behaviour of functions makes some of the assertions in previous test scripts no more valid. Temporary workaround is adopted, need a clean fixing.
 ### **tf-matplotlib** - seamless integration of matplotlib figures into TensorFlow summaries
 
 **tf-matplotlib** renders your everyday matplotlib figures tinside TensorFlow's Tensorboard visualization interface. The library
